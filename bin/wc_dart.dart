@@ -10,19 +10,24 @@ void main(List<String> arguments) async {
   parser.addFlag('lines', abbr: 'l');
   parser.addFlag('words', abbr: 'w');
   parser.addFlag('chars', abbr: 'm');
+  parser.addFlag('version', abbr: 'v');
 
   ArgResults argResults = parser.parse(arguments);
 
   final List<String> paths = argResults.rest;
   final bool allCommands = !argResults.wasParsed('bytes') && !argResults.wasParsed('lines') && !argResults.wasParsed('chars') && !argResults.wasParsed('words');
 
-  await wc(
-    paths,
-    countBytes: allCommands ? true : argResults.wasParsed('bytes'),
-    countLines: allCommands ? true : argResults.wasParsed('lines'),
-    countChars: allCommands ? true : argResults.wasParsed('chars'),
-    countWords: allCommands ? true : argResults.wasParsed('words'),
-  );
+  if (argResults.wasParsed('version')) {
+    stdout.writeln(await wc_dart.getVersion());
+  } else {
+    await wc(
+      paths,
+      countBytes: allCommands ? true : argResults.wasParsed('bytes'),
+      countLines: allCommands ? true : argResults.wasParsed('lines'),
+      countChars: allCommands ? true : argResults.wasParsed('chars'),
+      countWords: allCommands ? true : argResults.wasParsed('words'),
+    );
+  }
 }
 
 Future<void> wc(
