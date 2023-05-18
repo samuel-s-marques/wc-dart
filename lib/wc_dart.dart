@@ -20,3 +20,7 @@ Future<int> countWords(File file) async {
   final String text = await file.readAsString();
   return RegExp(r'[\w-]+').allMatches(text).length;
 }
+
+String padRight(String value) {
+  return '$value ';
+}

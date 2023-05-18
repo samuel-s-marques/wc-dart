@@ -25,10 +25,6 @@ void main(List<String> arguments) async {
   );
 }
 
-String padRight(String value) {
-  return '$value ';
-}
-
 Future<void> wc(
   List<String> paths, {
   bool countBytes = false,
@@ -44,25 +40,25 @@ Future<void> wc(
 
       if (countBytes) {
         final int bytes = await wc_dart.countBytes(file);
-        stdout.write(padRight(bytes.toString()));
+        stdout.write(wc_dart.padRight(bytes.toString()));
       }
 
       if (countLines) {
         final int lines = await wc_dart.countLines(file);
-        stdout.write(padRight(lines.toString()));
+        stdout.write(wc_dart.padRight(lines.toString()));
       }
 
       if (countWords) {
         final int words = await wc_dart.countWords(file);
-        stdout.write(padRight(words.toString()));
+        stdout.write(wc_dart.padRight(words.toString()));
       }
 
       if (countChars) {
         final int chars = await wc_dart.countChars(file);
-        stdout.write(padRight(chars.toString()));
+        stdout.write(wc_dart.padRight(chars.toString()));
       }
 
-      stdout.write(padRight(file.path));
+      stdout.write(wc_dart.padRight(file.path));
     }
   }
 }
