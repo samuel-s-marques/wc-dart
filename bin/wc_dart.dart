@@ -11,15 +11,19 @@ void main(List<String> arguments) async {
   parser.addFlag('words', abbr: 'w');
   parser.addFlag('chars', abbr: 'm');
   parser.addFlag('version', abbr: 'v');
+  parser.addFlag('help', abbr: 'h');
 
   ArgResults argResults = parser.parse(arguments);
 
-  final List<String> paths = argResults.rest;
-  final bool allCommands = !argResults.wasParsed('bytes') && !argResults.wasParsed('lines') && !argResults.wasParsed('chars') && !argResults.wasParsed('words');
-
   if (argResults.wasParsed('version')) {
     stdout.writeln(await wc_dart.getVersion());
+  } else if (argResults.wasParsed('help')) {
+    stdout.write(wc_dart.getHelp());
   } else {
+    final List<String> paths = argResults.rest;
+    final bool allCommands =
+        !argResults.wasParsed('bytes') && !argResults.wasParsed('lines') && !argResults.wasParsed('chars') && !argResults.wasParsed('words');
+
     await wc(
       paths,
       countBytes: allCommands ? true : argResults.wasParsed('bytes'),
