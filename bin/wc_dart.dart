@@ -48,11 +48,6 @@ Future<void> wc(
       for (int index = 0; index < paths.length; index++) {
         final File file = File(paths[index]);
 
-        if (countBytes) {
-          final int bytes = await wc_dart.countBytes(file);
-          stdout.write(wc_dart.padRight(bytes.toString()));
-        }
-
         if (countLines) {
           final int lines = await wc_dart.countLines(file);
           stdout.write(wc_dart.padRight(lines.toString()));
@@ -66,6 +61,11 @@ Future<void> wc(
         if (countChars) {
           final int chars = await wc_dart.countChars(file);
           stdout.write(wc_dart.padRight(chars.toString()));
+        }
+
+        if (countBytes) {
+          final int bytes = await wc_dart.countBytes(file);
+          stdout.write(wc_dart.padRight(bytes.toString()));
         }
 
         stdout.writeln(wc_dart.padRight(file.path));
