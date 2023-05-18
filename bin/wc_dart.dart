@@ -35,30 +35,34 @@ Future<void> wc(
   if (paths.isEmpty) {
     stderr.writeln('Error: no file found.');
   } else {
-    for (int index = 0; index < paths.length; index++) {
-      final File file = File(paths[index]);
+    try {
+      for (int index = 0; index < paths.length; index++) {
+        final File file = File(paths[index]);
 
-      if (countBytes) {
-        final int bytes = await wc_dart.countBytes(file);
-        stdout.write(wc_dart.padRight(bytes.toString()));
+        if (countBytes) {
+          final int bytes = await wc_dart.countBytes(file);
+          stdout.write(wc_dart.padRight(bytes.toString()));
+        }
+
+        if (countLines) {
+          final int lines = await wc_dart.countLines(file);
+          stdout.write(wc_dart.padRight(lines.toString()));
+        }
+
+        if (countWords) {
+          final int words = await wc_dart.countWords(file);
+          stdout.write(wc_dart.padRight(words.toString()));
+        }
+
+        if (countChars) {
+          final int chars = await wc_dart.countChars(file);
+          stdout.write(wc_dart.padRight(chars.toString()));
+        }
+
+        stdout.writeln(wc_dart.padRight(file.path));
       }
-
-      if (countLines) {
-        final int lines = await wc_dart.countLines(file);
-        stdout.write(wc_dart.padRight(lines.toString()));
-      }
-
-      if (countWords) {
-        final int words = await wc_dart.countWords(file);
-        stdout.write(wc_dart.padRight(words.toString()));
-      }
-
-      if (countChars) {
-        final int chars = await wc_dart.countChars(file);
-        stdout.write(wc_dart.padRight(chars.toString()));
-      }
-
-      stdout.write(wc_dart.padRight(file.path));
+    } catch (e) {
+      stderr.writeln('Error: $e');
     }
   }
 }
