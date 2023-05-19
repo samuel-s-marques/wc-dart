@@ -12,7 +12,15 @@ int countLines(String content) {
 }
 
 int countChars(String content) {
-  return content.length;
+  int charCount = 0;
+
+  for (int index = 0; index < content.length; index++) {
+    if (content[index] != '\n' && content[index] != '\r' && content[index] != '\t') {
+      charCount++;
+    }
+  }
+
+  return charCount;
 }
 
 int countWords(String content) {
