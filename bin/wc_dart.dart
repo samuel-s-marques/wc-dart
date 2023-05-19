@@ -68,8 +68,8 @@ The options below may be used to select which counts are printed, always in the 
         );
 
         stdout.writeln(wc_dart.padRight(file.path));
-        exit(0);
       }
+      exit(0);
     } catch (e) {
       stderr.writeln('Error: $e');
       exitCode = 2;
