@@ -36,16 +36,3 @@ Future<String> getVersion() async {
 
   return RegExp(r'version:.+').firstMatch(text)?.group(0) ?? version;
 }
-
-String getHelp() {
-  return '''
-Usage: wc_dart [OPTION]... [FILE]...
-
-Print newline, word, and byte counts for each FILE, and a total line if more than one FILE is specified. A word is a non-zero-length sequence of characteres delimited by white space.
-
-The options below may be used to select which counts are printed, always in the following order: newline, word, character, byte.
-    -c, --bytes ${' ' * 5} print the byte counts
-    -m, --chars ${' ' * 5} print the character counts
-    -l, --lines ${' ' * 5} print the newline counts
-    -w, --words ${' ' * 5} print the word counts''';
-}
