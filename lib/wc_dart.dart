@@ -1,25 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:path/path.dart' show dirname, join;
+import 'package:path/path.dart' show dirname;
 
-Future<int> countBytes(File file) async {
-  final Uint8List bytes = await file.readAsBytes();
+int countBytes(String content) {
+  final List<int> bytes = content.codeUnits;
   return bytes.length;
 }
 
-Future<int> countLines(File file) async {
-  final List<String> lines = await file.readAsLines();
-  return lines.length;
+int countLines(String content) {
+  return LineSplitter().convert(content).length;
 }
 
-Future<int> countChars(File file) async {
-  final String text = await file.readAsString();
-  return text.length;
+int countChars(String content) {
+  return content.length;
 }
 
-Future<int> countWords(File file) async {
-  final String text = await file.readAsString();
-  return RegExp(r'[\w-]+').allMatches(text).length;
+int countWords(String content) {
+  return RegExp(r'[\w-]+').allMatches(content).length;
 }
 
 String padRight(String value) {

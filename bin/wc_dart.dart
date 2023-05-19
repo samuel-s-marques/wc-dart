@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -14,6 +16,11 @@ void main(List<String> arguments) async {
   parser.addFlag('help', abbr: 'h');
 
   ArgResults argResults = parser.parse(arguments);
+  final List<String> flagNames = ['bytes', 'lines', 'chars', 'words'];
+  Stream<List<int>> input = stdin;
+  Utf8Decoder decoder = utf8.decoder;
+  String dataString = '';
+  final bool allCommands = !flagNames.any(argResults.wasParsed);
 
   if (argResults.wasParsed('version')) {
     stdout.writeln(await wc_dart.getVersion());
@@ -21,57 +28,71 @@ void main(List<String> arguments) async {
     stdout.write(wc_dart.getHelp());
   } else {
     final List<String> paths = argResults.rest;
-    final bool allCommands =
-        !argResults.wasParsed('bytes') && !argResults.wasParsed('lines') && !argResults.wasParsed('chars') && !argResults.wasParsed('words');
 
-    await wc(
-      paths,
-      countBytes: allCommands ? true : argResults.wasParsed('bytes'),
-      countLines: allCommands ? true : argResults.wasParsed('lines'),
-      countChars: allCommands ? true : argResults.wasParsed('chars'),
-      countWords: allCommands ? true : argResults.wasParsed('words'),
-    );
-  }
-}
+    if (paths.isEmpty && stdin.hasTerminal) {
+      stderr.writeln('Error: no file found.');
+      exitCode = 2;
+    }
 
-Future<void> wc(
-  List<String> paths, {
-  bool countBytes = false,
-  bool countLines = false,
-  bool countWords = false,
-  bool countChars = false,
-}) async {
-  if (paths.isEmpty) {
-    stderr.writeln('Error: no file found.');
-  } else {
+    if (!stdin.hasTerminal) {
+      input.transform(decoder).listen((String data) {
+        dataString += data;
+      }, onDone: () {
+        wc(
+          dataString,
+          countBytes: allCommands || argResults.wasParsed('bytes'),
+          countLines: allCommands || argResults.wasParsed('lines'),
+          countChars: allCommands || argResults.wasParsed('chars'),
+          countWords: allCommands || argResults.wasParsed('words'),
+        );
+      });
+    }
+
     try {
       for (int index = 0; index < paths.length; index++) {
         final File file = File(paths[index]);
+        final String content = await file.readAsString();
 
-        if (countLines) {
-          final int lines = await wc_dart.countLines(file);
-          stdout.write(wc_dart.padRight(lines.toString()));
-        }
-
-        if (countWords) {
-          final int words = await wc_dart.countWords(file);
-          stdout.write(wc_dart.padRight(words.toString()));
-        }
-
-        if (countChars) {
-          final int chars = await wc_dart.countChars(file);
-          stdout.write(wc_dart.padRight(chars.toString()));
-        }
-
-        if (countBytes) {
-          final int bytes = await wc_dart.countBytes(file);
-          stdout.write(wc_dart.padRight(bytes.toString()));
-        }
+        await wc(
+          content,
+          countBytes: allCommands || argResults.wasParsed('bytes'),
+          countLines: allCommands || argResults.wasParsed('lines'),
+          countChars: allCommands || argResults.wasParsed('chars'),
+          countWords: allCommands || argResults.wasParsed('words'),
+        );
 
         stdout.writeln(wc_dart.padRight(file.path));
       }
     } catch (e) {
       stderr.writeln('Error: $e');
     }
+  }
+}
+
+Future<void> wc(
+  String content, {
+  bool countBytes = false,
+  bool countLines = false,
+  bool countWords = false,
+  bool countChars = false,
+}) async {
+  if (countLines) {
+    final int lines = wc_dart.countLines(content);
+    stdout.write(wc_dart.padRight(lines.toString()));
+  }
+
+  if (countWords) {
+    final int words = wc_dart.countWords(content);
+    stdout.write(wc_dart.padRight(words.toString()));
+  }
+
+  if (countChars) {
+    final int chars = wc_dart.countChars(content);
+    stdout.write(wc_dart.padRight(chars.toString()));
+  }
+
+  if (countBytes) {
+    final int bytes = wc_dart.countBytes(content);
+    stdout.write(wc_dart.padRight(bytes.toString()));
   }
 }
