@@ -8,12 +8,12 @@ import 'package:wc_dart/wc_dart.dart' as wc_dart;
 void main(List<String> arguments) async {
   final ArgParser parser = ArgParser();
 
-  parser.addFlag('bytes', abbr: 'c');
-  parser.addFlag('lines', abbr: 'l');
-  parser.addFlag('words', abbr: 'w');
-  parser.addFlag('chars', abbr: 'm');
-  parser.addFlag('version', abbr: 'v');
-  parser.addFlag('help', abbr: 'h');
+  parser.addFlag('bytes', abbr: 'c', help: 'Print the count of bytes');
+  parser.addFlag('lines', abbr: 'l', help: 'Print the count of newlines');
+  parser.addFlag('words', abbr: 'w', help: 'Print the count of words');
+  parser.addFlag('chars', abbr: 'm', help: 'Print the count of characters');
+  parser.addFlag('version', abbr: 'v', negatable: false, help: 'Print the current version of wc-dart');
+  parser.addFlag('help', abbr: 'h', negatable: false, help: 'Print the options of wc-dart');
 
   ArgResults argResults = parser.parse(arguments);
   final List<String> flagNames = ['bytes', 'lines', 'chars', 'words'];
@@ -25,7 +25,12 @@ void main(List<String> arguments) async {
   if (argResults.wasParsed('version')) {
     stdout.writeln(await wc_dart.getVersion());
   } else if (argResults.wasParsed('help')) {
-    stdout.write(wc_dart.getHelp());
+    stdout.writeln('''
+Usage: wc_dart [OPTION]... [FILE]...
+
+Print newline, word, and byte counts for each FILE, and a total line if more than one FILE is specified. A word is a non-zero-length sequence of characteres delimited by white space.
+The options below may be used to select which counts are printed, always in the following order: newline, word, character, byte.''');
+    stdout.write(parser.usage);
   } else {
     final List<String> paths = argResults.rest;
 
