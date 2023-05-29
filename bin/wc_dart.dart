@@ -17,10 +17,10 @@ void main(List<String> arguments) async {
 
   ArgResults argResults = parser.parse(arguments);
   final List<String> flagNames = ['bytes', 'lines', 'chars', 'words'];
+  final bool allCommands = !flagNames.any(argResults.wasParsed);
   Stream<List<int>> input = stdin;
   Utf8Decoder decoder = utf8.decoder;
   String dataString = '';
-  final bool allCommands = !flagNames.any(argResults.wasParsed);
 
   if (argResults.wasParsed('version')) {
     stdout.writeln(await wc_dart.getVersion());
@@ -34,24 +34,23 @@ The options below may be used to select which counts are printed, always in the 
   } else {
     final List<String> paths = argResults.rest;
 
-    if (paths.isEmpty && stdin.hasTerminal) {
-      stderr.writeln('Error: no file found.');
-      exitCode = 2;
+    if (!stdin.hasTerminal) {
+      dataString = await input.transform(decoder).join();
+
+      await wc(
+        dataString,
+        countBytes: true,
+        countLines: true,
+        countChars: true,
+        countWords: true,
+      );
+
+      exit(0);
     }
 
-    if (!stdin.hasTerminal) {
-      input.transform(decoder).listen((String data) {
-        dataString += data;
-      }, onDone: () {
-        wc(
-          dataString,
-          countBytes: allCommands || argResults.wasParsed('bytes'),
-          countLines: allCommands || argResults.wasParsed('lines'),
-          countChars: allCommands || argResults.wasParsed('chars'),
-          countWords: allCommands || argResults.wasParsed('words'),
-        );
-        exit(0);
-      });
+    if (paths.isEmpty) {
+      stderr.writeln('Error: no file found.');
+      exitCode = 2;
     }
 
     try {
@@ -68,8 +67,8 @@ The options below may be used to select which counts are printed, always in the 
         );
 
         stdout.writeln(wc_dart.padRight(file.path));
-        exit(0);
       }
+      exit(0);
     } catch (e) {
       stderr.writeln('Error: $e');
       exitCode = 2;
