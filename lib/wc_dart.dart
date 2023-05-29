@@ -3,28 +3,32 @@ import 'dart:io';
 import 'package:path/path.dart' show dirname;
 
 int countBytes(String content) {
-  final List<int> bytes = content.codeUnits;
+  List<int> bytes = utf8.encode(content);
   return bytes.length;
 }
 
 int countLines(String content) {
-  return LineSplitter().convert(content).length;
+  return '\n'.allMatches(content).length;
 }
 
 int countChars(String content) {
-  int charCount = 0;
-
-  for (int index = 0; index < content.length; index++) {
-    if (content[index] != '\n' && content[index] != '\r' && content[index] != '\t') {
-      charCount++;
-    }
-  }
-
-  return charCount;
+  return content.length;
 }
 
 int countWords(String content) {
-  return RegExp(r'[\w-]+').allMatches(content).length;
+  int count = 0;
+  bool isWord = false;
+
+  for (int index = 0; index < content.length; index++) {
+    if (content[index].trim().isEmpty) {
+      isWord = false;
+    } else if (!isWord) {
+      count++;
+      isWord = true;
+    }
+  }
+
+  return count;
 }
 
 String padRight(String value) {
